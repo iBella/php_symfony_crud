@@ -20,6 +20,7 @@ class UserRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
+        $this->manager = $registry->getManager();
     }
 
     /**
@@ -30,32 +31,29 @@ class UserRepository extends ServiceEntityRepository
         return $this->manager->getRepository(User::class)->findAll();
     }
 
-    // /**
-    //  * @return Product[] Returns an array of Product objects
-    //  */
-    /*
-    public function findByExampleField($value)
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('p.id', 'ASC')
-            ->setMaxResults(10)
-            ->getQuery()
-            ->getResult()
-        ;
-    }
+    /**
+    * @return User Finds an entity by its primary key / identifier.
     */
+    public function findById(int $id)
+    {
+        return $this->manager->getRepository(User::class)->find($id);
+    }
 
-    /*
-    public function findOneBySomeField($value): ?Product
-    {
-        return $this->createQueryBuilder('p')
-            ->andWhere('p.exampleField = :val')
-            ->setParameter('val', $value)
-            ->getQuery()
-            ->getOneOrNullResult()
-        ;
-    }
+    /**
+    * @return User Returns an User objects
     */
+    public function persist(User $user){
+        $this->manager->persist($user);
+        $this->manager->flush();
+        return $user;
+    }
+
+    /**
+    * @return User Remove an User objects
+    */
+    public function remove(User $user){
+        $this->manager->remove($user);
+        $this->manager->flush();
+    }
+
 }

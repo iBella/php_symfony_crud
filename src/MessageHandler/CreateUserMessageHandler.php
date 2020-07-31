@@ -8,25 +8,25 @@ use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Validator\ConstraintViolationInterface;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 
 final class CreateUserMessageHandler implements MessageHandlerInterface
 {
-    private EntityManagerInterface $manager;
+    private UserRepository $userRepository;
     private ValidatorInterface $validator;
 
-    public function __construct(EntityManagerInterface $manager, ValidatorInterface $validator)
+    public function __construct(UserRepository $userRepository, ValidatorInterface $validator)
     {
-        $this->manager = $manager;
         $this->validator = $validator;
+        $this->userRepository = $userRepository;
     }
 
     public function __invoke(CreateUserMessage $message)
     {
         $user = new User($message->getName(), $message->getEmail());
-        /*foreach ($this->telephones as $telephone) {
+        foreach ($message->getTelephones() as $telephone) {
             $user->addTelephone($telephone['number']);
-        }*/
+        }
 
         $errors = $this->validator->validate($user);
 
@@ -35,11 +35,10 @@ final class CreateUserMessageHandler implements MessageHandlerInterface
                 'property' => $violation->getPropertyPath(),
                 'message' => $violation->getMessage()
             ], iterator_to_array($errors));
-            return $violations;
+            throw new \InvalidArgumentException(print_r($violations));
         }
 
-        $this->manager->persist($user);
-        $this->manager->flush();
+        $this->userRepository->persist($user);
 
         $message->setId($user->getId());
 

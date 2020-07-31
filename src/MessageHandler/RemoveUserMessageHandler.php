@@ -2,29 +2,27 @@
 
 namespace App\MessageHandler;
 
-use App\Entity\User;
 use App\Message\RemoveUserMessage;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
 
 final class RemoveUserMessageHandler implements MessageHandlerInterface
 {
-    private EntityManagerInterface $manager;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->manager = $manager;
+        $this->userRepository = $userRepository;
     }
 
     public function __invoke(RemoveUserMessage $message)
     {
-        $user = $this->manager->getRepository(User::class)->find($message->getUserId());
+        $user = $this->userRepository->findById($message->getUserId());
 
         if (null === $user) {
             throw new \InvalidArgumentException('User with ID #' . $message->getUserId() . ' not found');
         }
 
-        $this->manager->remove($user);
-        $this->manager->flush();
+        $this->userRepository->remove($user);
     }
 }

@@ -9,20 +9,20 @@ use App\Message\ListUserMessage;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 
 final class ListUserMessageHandler implements MessageHandlerInterface
 {
-    private EntityManagerInterface $manager;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->manager = $manager;
+        $this->userRepository = $userRepository;
     }
 
     public function __invoke(ListUserMessage $message)
     {
-        $users = $this->manager->getRepository(User::class)->findAll();
+        $users = $this->userRepository->findAll();
 
         foreach ($users as $user) {
             $message->setData($this->userToArray($user));

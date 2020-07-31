@@ -6,7 +6,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 
 use Symfony\Component\Messenger\MessageBusInterface;
 
-use App\Entity\User;
 use App\Message\RemoveUserMessage;
 use App\Message\ListUserMessage;
 use App\Message\DetailUserMessage;
@@ -56,7 +55,7 @@ class UserController extends AbstractController
         $response = $this->bus->dispatch(new CreateUserMessage($json['name'], $json['email'], $json['telephones']));
 
         return new Response('', Response::HTTP_CREATED, [
-            'Location' => '/users' . $response->getMessage()
+            'Location' => '/users/' . $response->getMessage()->getId()
         ]);
     }
 

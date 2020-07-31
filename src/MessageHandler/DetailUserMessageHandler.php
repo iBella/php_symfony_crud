@@ -9,20 +9,20 @@ use App\Message\DetailUserMessage;
 
 use Symfony\Component\Messenger\Envelope;
 use Symfony\Component\Messenger\Handler\MessageHandlerInterface;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Repository\UserRepository;
 
 final class DetailUserMessageHandler implements MessageHandlerInterface
 {
-    private EntityManagerInterface $manager;
+    private UserRepository $userRepository;
 
-    public function __construct(EntityManagerInterface $manager)
+    public function __construct(UserRepository $userRepository)
     {
-        $this->manager = $manager;
+        $this->userRepository = $userRepository;
     }
 
     public function __invoke(DetailUserMessage $message)
     {
-        $user = $this->manager->getRepository(User::class)->find($message->getUserId());
+        $user = $this->userRepository->findById($message->getUserId());
 
         if (null === $user) {
             throw new \InvalidArgumentException('User with ID #' . $message->getUserId() . ' not found');
